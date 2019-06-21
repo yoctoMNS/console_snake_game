@@ -36,6 +36,11 @@ public class Snake extends GameObject {
         case RIGHT:
             right(); break;
         }
+
+        if (x > GameManager.STAGE_WIDTH-1) x = 0;
+        if (x < 0) x = GameManager.STAGE_WIDTH-1;
+        if (y > GameManager.STAGE_HEIGHT-1) y = 0;
+        if (y < 0) y = GameManager.STAGE_HEIGHT-1;
     }
 
 

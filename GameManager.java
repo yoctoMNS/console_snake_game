@@ -12,12 +12,12 @@ public class GameManager {
     public static final int STAGE_HEIGHT = 20;
     public static final int CELL_NONE = 0;
     public static final int CELL_SNAKE_HEAD = 1;
-    public static final int CELL_SNAKE_BODY = 2;
 
     private Snake snake;
     private Fruit fruit;
     private ConsoleController clear;
     private MyNativeHook hook;
+    private boolean isGameEnd;
 
 
     private class MyNativeHook implements NativeKeyListener {
@@ -59,6 +59,7 @@ public class GameManager {
     private void init() {
         buildInstance();
         fruit.setRandomPosition();
+        isGameEnd = false;
     }
 
 
@@ -73,6 +74,7 @@ public class GameManager {
     private void update() {
         snake.addTail();
         snake.move();
+        isGameEnd = isCollisionTail();
 
         if (snake.getX()==fruit.getX() &&
             snake.getY()==fruit.getY()) {
@@ -118,6 +120,18 @@ public class GameManager {
         System.out.println();
     }
 
+    
+    private boolean isCollisionTail() {
+        for (int i=0; i<snake.getLength(); ++i) {
+            if (snake.getX() == snake.getTailX(i) &&
+                snake.getY() == snake.getTailY(i)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     private void registerNativehook() {
         LogManager.getLogManager().reset();
@@ -136,10 +150,13 @@ public class GameManager {
         clear.execute();
         registerNativehook();
 
-        while (true) {
+        while (!isGameEnd) {
             draw();
             update();
             try { Thread.sleep(100); } catch (InterruptedException e) {}
         }
+
+        GlobalScreen.removeNativeKeyListener(hook);
+        System.exit(0);
     }
 }
